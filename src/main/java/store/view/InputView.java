@@ -29,4 +29,24 @@ public class InputView {
 
         return new WishProduct(items[0], Integer.parseInt(items[1]));
     }
+
+    public String requestAdditionConfirm() {
+        String input = Console.readLine();
+        validateInputYN(input);
+
+        return input;
+    }
+
+    public String requestBuyConfirm() {
+        String input = Console.readLine();
+        validateInputYN(input);
+
+        return input;
+    }
+
+    private void validateInputYN(String input) {
+        if (!input.equals("Y") && !input.equals("N")) {
+            throw new IllegalArgumentException("[ERROR] 잘못된 입력입니다. 다시 입력해 주세요.");
+        }
+    }
 }
