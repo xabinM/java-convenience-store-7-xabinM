@@ -2,15 +2,19 @@ package store.service;
 
 import store.model.Inventory;
 import store.model.Product;
+import store.model.Promotions;
 import store.model.WishProduct;
 
 import java.util.List;
 
 public class ProductService {
     private final Inventory inventory;
+    private final Promotions promotions;
 
-    public ProductService(Inventory inventory) {
+    public ProductService(Inventory inventory, Promotions promotions) {
         this.inventory = inventory;
+
+        this.promotions = promotions;
     }
 
     public boolean checkIsPromotionProduct(WishProduct wishProduct) {
