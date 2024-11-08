@@ -1,22 +1,40 @@
 package store.controller;
 
-import store.model.Inventory;
+import store.model.*;
+import store.service.ProductService;
+import store.service.PromotionService;
+import store.view.InputView;
+import store.view.OutputView;
 
-import static store.view.OutputView.*;
-import static store.view.InputView.*;
+import java.util.List;
 
 public class ConvenienceStore {
+    private final ProductService productService;
+    private final PromotionService promotionService;
+    private final Inventory inventory;
+    private final InputView inputView;
+    private final OutputView outputView;
+
+    public ConvenienceStore(ProductService productService, PromotionService promotionService, Inventory inventory) {
+        this.productService = productService;
+        this.promotionService = promotionService;
+        this.inventory = inventory;
+        this.inputView = new InputView();
+        this.outputView = new OutputView();
+    }
+
     public void runStore() {
         processDisplayProducts();
-        processRequestPurchase();
+        List<WishProduct> wishProducts = processRequestPurchase();
     }
 
-    private void processDisplayProducts() {
-        printEntry(new Inventory().loadProductsFromFile());
+    private void processDisplayProducts() {;
+        outputView.printEntry(inventory);
     }
 
-    private void processRequestPurchase() {
-        printRequestPurchase();
-        requestPurchaseProduct();
+    private List<WishProduct> processRequestPurchase() {
+        outputView.printRequestPurchase();
+
+        return inputView.requestPurchase();
     }
 }
