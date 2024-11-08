@@ -1,7 +1,7 @@
 package store.controller;
 
 import store.model.*;
-import store.service.ProductService;
+import store.service.Counter;
 import store.service.PromotionService;
 import store.view.InputView;
 import store.view.OutputView;
@@ -9,15 +9,15 @@ import store.view.OutputView;
 import java.util.List;
 
 public class ConvenienceStore {
-    private final ProductService productService;
+    private final Counter counter;
     private final PromotionService promotionService;
     private final Inventory inventory;
     private final Promotions promotions;
     private final InputView inputView;
     private final OutputView outputView;
 
-    public ConvenienceStore(ProductService productService, PromotionService promotionService, Inventory inventory, Promotions promotions) {
-        this.productService = productService;
+    public ConvenienceStore(Counter counter, PromotionService promotionService, Inventory inventory, Promotions promotions) {
+        this.counter = counter;
         this.promotionService = promotionService;
         this.inventory = inventory;
         this.promotions = promotions;
@@ -28,6 +28,7 @@ public class ConvenienceStore {
     public void runStore() {
         processDisplayProducts();
         List<WishProduct> wishProducts = processRequestPurchase();
+        processPromotionAndStock(wishProducts);
     }
 
     private void processDisplayProducts() {;
@@ -41,24 +42,29 @@ public class ConvenienceStore {
     }
 
     private void processPromotionAndStock(List<WishProduct> wishProducts) {
+        // 여기에서 각 process들이 DTO 객체를 뱉고 그 객체를 리스트로 싸서 리턴 시키면 될듯
         for (WishProduct wishProduct : wishProducts) {
-            if (productService.checkIsPromotionProduct(wishProduct)) {
+            if (counter.checkIsPromotionProduct(wishProduct)) {
                 processOnPromotion(wishProduct);
             }
-            processNonPromotion();
+            processNonPromotion(wishProduct);
         }
     }
 
     private void processOnPromotion(WishProduct wishProduct) {
         try {
-            productService.checkTotalStock(wishProduct);
+            counter.checkPromotionPeriod(wishProduct);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    private void processNonPromotion() {
-
+    private void processNonPromotion(WishProduct wishProduct) {
+        try {
+            counter.checkStock(wishProduct);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
 }

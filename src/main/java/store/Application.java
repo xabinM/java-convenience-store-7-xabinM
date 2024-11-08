@@ -5,7 +5,7 @@ import store.model.Inventory;
 import store.model.InventoryLoader;
 import store.model.PromotionLoader;
 import store.model.Promotions;
-import store.service.ProductService;
+import store.service.Counter;
 import store.service.PromotionService;
 
 public class Application {
@@ -13,7 +13,7 @@ public class Application {
         Inventory inventory = new Inventory(new InventoryLoader().loadProductsFromFile());
         Promotions promotions = new Promotions(new PromotionLoader().loadPromotionFromFile());
         ConvenienceStore convenienceStore = new ConvenienceStore(
-                new ProductService(inventory, promotions), new PromotionService(), inventory, promotions);
+                new Counter(inventory, promotions), new PromotionService(), inventory, promotions);
         convenienceStore.runStore();
     }
 }

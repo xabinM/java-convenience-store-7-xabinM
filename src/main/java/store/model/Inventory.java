@@ -1,6 +1,7 @@
 package store.model;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public record Inventory(List<Product> inventory) {
 
@@ -25,4 +26,15 @@ public record Inventory(List<Product> inventory) {
                 .sum();
     }
 
+    public List<Product> findProductsByName(String name) {
+
+        return inventory.stream()
+                .filter(product -> product.compareName(name))
+                .collect(Collectors.toList());
+    }
+
+    public int findIndexByProduct(Product product) {
+
+        return inventory.indexOf(product);
+    }
 }

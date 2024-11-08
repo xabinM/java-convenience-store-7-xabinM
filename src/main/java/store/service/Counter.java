@@ -3,12 +3,13 @@ package store.service;
 import store.model.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
-public class ProductService {
+public class Counter {
     private final Inventory inventory;
     private final Promotions promotions;
 
-    public ProductService(Inventory inventory, Promotions promotions) {
+    public Counter(Inventory inventory, Promotions promotions) {
         this.inventory = inventory;
         this.promotions = promotions;
     }
@@ -19,7 +20,7 @@ public class ProductService {
         return matchingProduct.isExistPromotion();
     }
 
-    public boolean checkPromotionPeriod(WishProduct wishProduct) {
+    public void checkPromotionPeriod(WishProduct wishProduct) {
         Promotion promotion = promotions.findPromotionByName(wishProduct.name());
 
         if (promotion.isDateInRange(LocalDate.now())) {
@@ -44,11 +45,18 @@ public class ProductService {
         Product product = inventory.findProductByName(wishProduct.name());
 
         if (product.compareStock(wishProduct.quantity())) {
-
+            checkOut(wishProduct);
         }
         throw new IllegalArgumentException("[ERROR] 재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.");
 
     }
 
-    public void calculate
+    public void checkOut(WishProduct wishProduct) {
+        List<Product> products = inventory.findProductsByName(wishProduct.name());
+        for (Product product : products) {
+            int indexInInventory = inventory.findIndexByProduct(product);
+            Product soldProduct = product.sellProduct(wishProduct.quantity());
+            inventory.updateProduct(indexInInventory, soldProduct);
+        }
+    }
 }
