@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class InventoryLoader {
     private final String filePath;
@@ -17,7 +18,7 @@ public class InventoryLoader {
             BufferedReader br = new BufferedReader(new FileReader(filePath));
             skipHeader(br);
 
-            return br.lines().map(this::parseProduct).toList();
+            return br.lines().map(this::parseProduct).collect(Collectors.toList());
         } catch (IOException e) {
             throw new IllegalArgumentException("파일을 읽는 도중 에러가 발생했습니다.");
         }
