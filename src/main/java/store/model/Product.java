@@ -2,30 +2,42 @@ package store.model;
 
 import java.text.DecimalFormat;
 
-public class Product {
-    private final String name;
-    private final int price;
-    private final int quantity;
-    private final String promotion;
+public record Product(String name, int price, int stock, String promotion) {
 
-    public Product(String name, int price, int quantity, String promotion) {
-        this.name = name;
-        this.price = price;
-        this.quantity = quantity;
-        this.promotion = promotion;
-    }
+    public Product sellProduct(int quantity) {
 
-    public Product sellProduct(int count) {
-        if (count > quantity) {
-            throw new IllegalArgumentException("재고 부족");
-        }
-
-        return new Product(name, price, quantity - count, promotion);
+        return new Product(name, price, stock - quantity, promotion);
     }
 
     @Override
     public String toString() {
         DecimalFormat priceFormat = new DecimalFormat("#,###");
-        return "- " + name + " " + priceFormat.format(price) + "원 " + quantity + "개 " + promotion;
+
+        if (promotion == null) {
+
+            return "- " + name + " " + priceFormat.format(price) + "원 " + stock + "개 ";
+        }
+
+        return "- " + name + " " + priceFormat.format(price) + "원 " + stock + "개 " + promotion;
+    }
+
+    public boolean compareName(String targetName) {
+
+        return name.equals(targetName);
+    }
+
+    public boolean compareStock(int quantity) {
+
+        return stock > quantity;
+    }
+
+    public boolean isExistPromotion() {
+
+        return promotion != null;
+    }
+
+    public boolean comparePromotion(String targetPromotion) {
+
+        return promotion.equals(targetPromotion);
     }
 }
