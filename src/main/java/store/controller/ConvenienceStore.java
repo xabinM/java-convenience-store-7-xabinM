@@ -6,6 +6,7 @@ import store.service.PromotionService;
 import store.view.InputView;
 import store.view.OutputView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ConvenienceStore {
@@ -28,7 +29,7 @@ public class ConvenienceStore {
     public void runStore() {
         processDisplayProducts();
         List<WishProduct> wishProducts = processRequestPurchase();
-        processPromotionAndStock(wishProducts);
+        List<ResultDTO> result = processPromotionAndStock(wishProducts);
     }
 
     private void processDisplayProducts() {;
@@ -41,30 +42,36 @@ public class ConvenienceStore {
         return inputView.requestPurchase();
     }
 
-    private void processPromotionAndStock(List<WishProduct> wishProducts) {
+    private List<ResultDTO> processPromotionAndStock(List<WishProduct> wishProducts) {
+        final List<ResultDTO> result = new ArrayList<>();
+
         // 여기에서 각 process들이 DTO 객체를 뱉고 그 객체를 리스트로 싸서 리턴 시키면 될듯
         for (WishProduct wishProduct : wishProducts) {
             if (counter.checkIsPromotionProduct(wishProduct)) {
-                processOnPromotion(wishProduct);
+                result.add(processOnPromotion(wishProduct));
+            } else {
+                result.add(processNonPromotion(wishProduct));
             }
-            processNonPromotion(wishProduct);
         }
+        return result;
     }
 
-    private void processOnPromotion(WishProduct wishProduct) {
+    private ResultDTO processOnPromotion(WishProduct wishProduct) {
         try {
             counter.checkPromotionPeriod(wishProduct);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
+        return null;
     }
 
-    private void processNonPromotion(WishProduct wishProduct) {
+    private ResultDTO processNonPromotion(WishProduct wishProduct) {
         try {
-            counter.checkStock(wishProduct);
+            return counter.checkNormalStock(wishProduct);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
+        return null;
     }
 
 }

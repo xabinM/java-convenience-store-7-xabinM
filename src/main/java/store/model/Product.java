@@ -33,7 +33,7 @@ public record Product(String name, int price, int stock, String promotion) {
 
     public boolean isExistPromotion() {
 
-        return promotion == null;
+        return promotion != null;
     }
 
     public boolean comparePromotion(String targetPromotion) {
