@@ -9,7 +9,7 @@ public record Promotion(String name, int buy, int get, LocalDate startDate, Loca
         return name.equals(targetName);
     }
 
-    public boolean isApplicable(int quantity) {
+    public boolean isFitQuantity(int quantity) {
 
         return quantity % (buy + get) == 0;
     }

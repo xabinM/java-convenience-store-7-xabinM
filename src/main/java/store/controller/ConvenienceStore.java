@@ -47,7 +47,7 @@ public class ConvenienceStore {
 
         // 여기에서 각 process들이 DTO 객체를 뱉고 그 객체를 리스트로 싸서 리턴 시키면 될듯
         for (WishProduct wishProduct : wishProducts) {
-            if (counter.checkIsPromotionProduct(wishProduct)) {
+            if (counter.checkIsPromotionProduct(wishProduct.name())) {
                 result.add(processOnPromotion(wishProduct));
             } else {
                 result.add(processNonPromotion(wishProduct));

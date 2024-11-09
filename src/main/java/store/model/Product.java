@@ -28,8 +28,9 @@ public record Product(String name, int price, int stock, String promotion) {
 
     public boolean compareStock(int quantity) {
 
-        return stock > quantity;
+        return stock >= quantity;
     }
+
 
     public boolean isExistPromotion() {
 
