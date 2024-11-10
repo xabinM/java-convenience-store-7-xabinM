@@ -63,7 +63,8 @@ public class ConvenienceStore {
 
     private ResultDTO processNonPromotion(WishProduct wishProduct) {
         try {
-            return counter.checkNormalStock(wishProduct);
+            Product product = inventory.findProductByName(wishProduct.name());
+            return counter.checkNormalStock(wishProduct, product);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }

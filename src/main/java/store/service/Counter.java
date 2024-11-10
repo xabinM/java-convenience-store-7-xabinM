@@ -27,15 +27,14 @@ public class Counter {
     }
 
     public ResultDTO checkPromotionPeriod(WishProduct wishProduct) {
-        Product product = inventory.findProductByName(wishProduct.name());
-        Promotion promotion = promotions.findPromotionByName(product.promotion());
+        List<Product> matchingProducts = inventory.findProductsByName(wishProduct.name());
+        Product promotionProduct = matchingProducts.getFirst();
+        Product normalProduct = matchingProducts.getLast();
+        Promotion promotion = promotions.findPromotionByName(promotionProduct.promotion());
         if (promotion.isDateInRange(LocalDate.now())) {
             return checkTotalStock(wishProduct);
         }
-        // 근데 이 프로모션 기간이 아니라는 메시지를 던질 필요가 있나? 없지.
-        // 그냥 일반 상품 처리하면됨 잠시 대기
-        //todo
-        throw new IllegalArgumentException("프로모션 기간에 해당하지 않는 상품입니다.");
+        return checkNormalStock(wishProduct, normalProduct);
     }
 
     private ResultDTO checkTotalStock(WishProduct wishProduct) {
@@ -138,9 +137,7 @@ public class Counter {
         return null;
     }
 
-    public ResultDTO checkNormalStock(WishProduct wishProduct) {
-        Product product = inventory.findProductByName(wishProduct.name());
-
+    public ResultDTO checkNormalStock(WishProduct wishProduct, Product product) {
         if (product.compareStock(wishProduct.quantity())) {
             return reduceStock(wishProduct.name(), wishProduct.quantity());
         }
