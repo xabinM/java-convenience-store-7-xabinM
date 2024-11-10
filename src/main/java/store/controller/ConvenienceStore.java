@@ -2,7 +2,7 @@ package store.controller;
 
 import store.model.*;
 import store.service.Counter;
-import store.service.PromotionService;
+import store.service.ReceiptMachine;
 import store.view.InputView;
 import store.view.OutputView;
 
@@ -11,17 +11,13 @@ import java.util.List;
 
 public class ConvenienceStore {
     private final Counter counter;
-    private final PromotionService promotionService;
     private final Inventory inventory;
-    private final Promotions promotions;
     private final InputView inputView;
     private final OutputView outputView;
 
-    public ConvenienceStore(Counter counter, PromotionService promotionService, Inventory inventory, Promotions promotions) {
+    public ConvenienceStore(Counter counter, Inventory inventory, Promotions promotions) {
         this.counter = counter;
-        this.promotionService = promotionService;
         this.inventory = inventory;
-        this.promotions = promotions;
         this.inputView = new InputView();
         this.outputView = new OutputView();
     }
@@ -30,8 +26,7 @@ public class ConvenienceStore {
         processDisplayProducts();
         List<WishProduct> wishProducts = processRequestPurchase();
         List<ResultDTO> result = processPromotionAndStock(wishProducts);
-        System.out.println("result : " + result);
-        outputView.printEntry(inventory);
+        processDisplayReceipt(result);
     }
 
     private void processDisplayProducts() {;
@@ -47,7 +42,6 @@ public class ConvenienceStore {
     private List<ResultDTO> processPromotionAndStock(List<WishProduct> wishProducts) {
         final List<ResultDTO> result = new ArrayList<>();
 
-        // 여기에서 각 process들이 DTO 객체를 뱉고 그 객체를 리스트로 싸서 리턴 시키면 될듯
         for (WishProduct wishProduct : wishProducts) {
             if (counter.checkIsPromotionProduct(wishProduct.name())) {
                 result.add(processOnPromotion(wishProduct));
@@ -74,6 +68,22 @@ public class ConvenienceStore {
             System.out.println(e.getMessage());
         }
         return null;
+    }
+
+    private void processDisplayReceipt(List<ResultDTO> result) {
+        List<String> receipt = new ReceiptMachine(processRequestMemberShip()).makeReceipt(result);
+        outputView.printReceipt(receipt);
+    }
+
+    private boolean processRequestMemberShip() {
+        while (true){
+            try {
+                outputView.printMembershipConfirm();
+                return inputView.requestMemberShipConfirm().equals("Y");
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
 }

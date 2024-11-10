@@ -6,14 +6,13 @@ import store.model.InventoryLoader;
 import store.model.PromotionLoader;
 import store.model.Promotions;
 import store.service.Counter;
-import store.service.PromotionService;
 
 public class Application {
     public static void main(String[] args) {
         Inventory inventory = new Inventory(new InventoryLoader().loadProductsFromFile());
         Promotions promotions = new Promotions(new PromotionLoader().loadPromotionFromFile());
         ConvenienceStore convenienceStore = new ConvenienceStore(
-                new Counter(inventory, promotions), new PromotionService(), inventory, promotions);
+                new Counter(inventory, promotions), inventory, promotions);
         convenienceStore.runStore();
     }
 }
