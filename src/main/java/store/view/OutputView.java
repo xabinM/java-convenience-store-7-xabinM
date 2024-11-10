@@ -3,6 +3,8 @@ package store.view;
 import store.model.Inventory;
 import store.model.Product;
 
+import java.util.List;
+
 public class OutputView {
     private static final String PRINT_ENTRY_HELLO = "안녕하세요. W편의점입니다.";
     private static final String PRINT_ENTRY_INVENTORY = "현재 보유하고 있는 상품입니다.";
@@ -35,5 +37,15 @@ public class OutputView {
 
     public void printBuyConfirm(String name, int quantity) {
         System.out.printf("현재 %s %d개는 프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까? (Y/N)\n", name, quantity);
+    }
+
+    public void printMembershipConfirm() {
+        System.out.println("멤버십 할인을 받으시겠습니까? (Y/N)");
+    }
+
+    public void printReceipt(List<String> receipt) {
+        for (String receiptLine : receipt) {
+            System.out.println(receiptLine);
+        }
     }
 }
