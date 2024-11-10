@@ -30,6 +30,8 @@ public class ConvenienceStore {
         processDisplayProducts();
         List<WishProduct> wishProducts = processRequestPurchase();
         List<ResultDTO> result = processPromotionAndStock(wishProducts);
+        System.out.println("result : " + result);
+        outputView.printEntry(inventory);
     }
 
     private void processDisplayProducts() {;
@@ -58,7 +60,7 @@ public class ConvenienceStore {
 
     private ResultDTO processOnPromotion(WishProduct wishProduct) {
         try {
-            counter.checkPromotionPeriod(wishProduct);
+            return counter.checkPromotionPeriod(wishProduct);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }

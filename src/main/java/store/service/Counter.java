@@ -26,24 +26,22 @@ public class Counter {
         return matchingProduct.isExistPromotion();
     }
 
-    public void checkPromotionPeriod(WishProduct wishProduct) {
+    public ResultDTO checkPromotionPeriod(WishProduct wishProduct) {
         Product product = inventory.findProductByName(wishProduct.name());
         Promotion promotion = promotions.findPromotionByName(product.promotion());
-
         if (promotion.isDateInRange(LocalDate.now())) {
-            checkTotalStock(wishProduct);
-            return;
+            return checkTotalStock(wishProduct);
         }
         // 근데 이 프로모션 기간이 아니라는 메시지를 던질 필요가 있나? 없지.
         // 그냥 일반 상품 처리하면됨 잠시 대기
         throw new IllegalArgumentException("프로모션 기간에 해당하지 않는 상품입니다.");
     }
 
-    private void checkTotalStock(WishProduct wishProduct) {
+    private ResultDTO checkTotalStock(WishProduct wishProduct) {
         int totalStock = inventory.findTotalStockByName(wishProduct.name());
 
         if (totalStock > wishProduct.quantity()) {
-
+            return checkPromotionStock(wishProduct);
         }
         throw new IllegalArgumentException("[ERROR] 재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.");
     }
@@ -61,15 +59,49 @@ public class Counter {
         // todo
         // 프로모션 재고를 넘어서는 quantity를 입력받았을때
 
-        return;
+        return checkOverPromotionStock(wishProduct);
     }
 
+    public ResultDTO checkOverPromotionStock(WishProduct wishProduct) {
+        List<Product> products = inventory.findProductsByName(wishProduct.name());
+        Product productOnPromotion = products.getFirst();
+        Product productNonPromotion = products.getLast();
+        Promotion promotion = promotions.findPromotionByName(productOnPromotion.promotion());
+        int overQuantity = wishProduct.quantity() - productOnPromotion.stock();
+        int unApplied = (wishProduct.quantity() - overQuantity) % (promotion.buy() + promotion.get());
+        // overQuantity 만큼 프로모션 할인이 적용 안돼요.
+        // 여기서 일반 재고만 감소를 따로 시키고
+        // 프로모션 상품을 재고 처리 함수에 넘긴다.
+        // + ((양 - 오버양) % (buy + get))
+        return decidePurchaseOrNo(wishProduct, overQuantity, unApplied, productNonPromotion, productOnPromotion);
+    }
+    private ResultDTO decidePurchaseOrNo(WishProduct wishProduct, int overQuantity
+            , int unApplied, Product productNonPromotion, Product productOnPromotion) {
+        while (true){
+            try {
+                outputView.printBuyConfirm(wishProduct.name(), overQuantity + unApplied);
+                String input = inputView.requestBuyConfirm();
+                if (input.equals("Y")) {
+                    inventory.updateProduct(inventory.findIndexByProduct(productNonPromotion),
+                            productNonPromotion.sellProduct(overQuantity));
+                    return reduceStock(productOnPromotion.name(), wishProduct.quantity());
+                }
+                if (input.equals("N")) {
+                    WishProduct newWishProduct = wishProduct.decreaseQuantity(overQuantity + unApplied);
 
+                    return reduceStock(newWishProduct.name(), newWishProduct.quantity());
+                }
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
 
     // 프로모션 혜택 적용 quantity 검증
     private ResultDTO checkFitPromotionBenefit(WishProduct wishProduct) {
-        Promotion promotion = promotions.findPromotionByName(wishProduct.name());
-
+        Product product = inventory.findProductByName(wishProduct.name());
+        System.out.println("프로모션 이름 : "+product.promotion());
+        Promotion promotion = promotions.findPromotionByName(product.promotion());
         if (promotion.isFitQuantity(wishProduct.quantity())) {
             // 2+1 or 1+1 로 나눴는데 딱 나눠떨어지네?
             // 그럼 그냥 재고 계산 호출
@@ -82,23 +114,22 @@ public class Counter {
 
     // quantity가 적어서 혜택을 못받아요 더 가져오실?
     private ResultDTO checkLessBenefit(WishProduct wishProduct, Promotion promotion) {
-        int remain = wishProduct.quantity() % (promotion.buy() + promotion.get());
         Product product = inventory.findProductByName(wishProduct.name());
 
         if (product.stock() == wishProduct.quantity()) {
             return reduceStock(wishProduct.name(), wishProduct.quantity());
         }
 
-        return decideAddOrNo(wishProduct, remain);
+        return decideAddOrNo(wishProduct, promotion.get());
     }
 
-    private ResultDTO decideAddOrNo(WishProduct wishProduct, int remain) {
+    private ResultDTO decideAddOrNo(WishProduct wishProduct, int bonus) {
         while (true){
             try {
-                outputView.printAdditionConfirm(wishProduct.name(), wishProduct.quantity());
+                outputView.printAdditionConfirm(wishProduct.name(), bonus);
                 String input = inputView.requestAdditionConfirm();
                 if (input.equals("Y")) {
-                    WishProduct newWishProduct = wishProduct.increaseQuantity(remain);
+                    WishProduct newWishProduct = wishProduct.increaseQuantity(bonus);
 
                     return reduceStock(newWishProduct.name(), newWishProduct.quantity());
                 }
@@ -139,11 +170,12 @@ public class Counter {
         if (checkIsPromotionProduct(soldProduct.name())) {
             Promotion promotion = promotions.findPromotionByName(soldProduct.promotion());
 
-            return new ResultDTO(soldProduct.name(), soldProduct.price()
-                    , quantity, promotion.buy(), promotion.get(), preStock);
+            return new ResultDTO(soldProduct.name()
+                    , soldProduct.price(), quantity
+                    , true, promotion.buy(), promotion.get(), preStock);
         }
         return new ResultDTO(soldProduct.name()
                 , soldProduct.price(), quantity
-                , 0, 0, preStock);
+                , false, 0, 0, preStock);
     }
 }

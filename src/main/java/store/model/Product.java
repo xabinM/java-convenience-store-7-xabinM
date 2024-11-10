@@ -5,6 +5,10 @@ import java.text.DecimalFormat;
 public record Product(String name, int price, int stock, String promotion) {
 
     public Product sellProduct(int quantity) {
+        if (stock - quantity < 0) {
+
+            return new Product(name, price, 0, promotion);
+        }
 
         return new Product(name, price, stock - quantity, promotion);
     }
