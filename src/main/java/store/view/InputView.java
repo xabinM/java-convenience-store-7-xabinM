@@ -1,16 +1,27 @@
 package store.view;
 
 import camp.nextstep.edu.missionutils.Console;
+import store.model.Inventory;
 import store.model.WishProduct;
+import static store.validator.WishProductValidator.*;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class InputView {
-    public List<WishProduct> requestPurchase() {
-        String input = Console.readLine();
+    private final Inventory inventory;
 
-        return listing(input.trim());
+    public InputView(Inventory inventory) {
+        this.inventory = inventory;
+    }
+
+    public List<WishProduct> requestPurchase(Inventory inventory) {
+        String input = Console.readLine().trim();
+
+        validateInputFormat(input);
+
+        return listing(input);
     }
 
     private List<WishProduct> listing(String input) {
@@ -27,32 +38,40 @@ public class InputView {
     private WishProduct parseWishProduct(String part) {
         String[] items = part.replaceAll("[\\[\\]]", "").split("-");
 
-        return new WishProduct(items[0], Integer.parseInt(items[1]));
+        String name = items[0];
+        String stringQuantity = items[1];
+
+        validateParseInteger(stringQuantity);
+
+        int quantity = Integer.parseInt(stringQuantity);
+        validateWishProduct(name, quantity, inventory);
+
+        return new WishProduct(name, quantity);
     }
 
     public String requestAdditionConfirm() {
-        String input = Console.readLine();
+        String input = Console.readLine().trim();
         validateInputYN(input);
 
         return input;
     }
 
     public String requestBuyConfirm() {
-        String input = Console.readLine();
+        String input = Console.readLine().trim();
         validateInputYN(input);
 
         return input;
     }
 
     public String requestMemberShipConfirm() {
-        String input = Console.readLine();
+        String input = Console.readLine().trim();
         validateInputYN(input);
 
         return input;
     }
 
     public String requestRepurchaseConfirm() {
-        String input = Console.readLine();
+        String input = Console.readLine().trim();
         validateInputYN(input);
 
         return input;
