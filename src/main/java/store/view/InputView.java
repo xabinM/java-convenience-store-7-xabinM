@@ -4,6 +4,7 @@ import camp.nextstep.edu.missionutils.Console;
 import store.model.Inventory;
 import store.model.WishProduct;
 import static store.validator.WishProductValidator.*;
+import static store.validator.YNConfirmValidator.*;
 
 
 import java.util.ArrayList;
@@ -75,11 +76,5 @@ public class InputView {
         validateInputYN(input);
 
         return input;
-    }
-
-    private void validateInputYN(String input) {
-        if (!input.equals("Y") && !input.equals("N")) {
-            throw new IllegalArgumentException("[ERROR] 잘못된 입력입니다. 다시 입력해 주세요.");
-        }
     }
 }
