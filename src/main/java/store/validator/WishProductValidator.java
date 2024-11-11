@@ -1,5 +1,6 @@
 package store.validator;
 
+import store.exception.Exception;
 import store.model.Inventory;
 
 public class WishProductValidator {
@@ -11,7 +12,7 @@ public class WishProductValidator {
     public static void validateName(String inputName, Inventory inventory) {
         if (inventory.inventory().stream()
                 .noneMatch(product -> product.compareName(inputName))) {
-            throw new IllegalArgumentException("[ERROR] 존재하지 않는 상품입니다. 다시 입력해 주세요.");
+            throw new IllegalArgumentException(Exception.PRODUCT_NOT_FOUND.getMessage());
         }
     }
 
@@ -19,13 +20,13 @@ public class WishProductValidator {
         int totalStock = inventory.findTotalStockByName(name);
 
         if (inputQuantity > totalStock) {
-            throw new IllegalArgumentException("[ERROR] 재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.");
+            throw new IllegalArgumentException(Exception.STOCK_EXCEEDED.getMessage());
         }
     }
 
     public static void validateInputFormat(String input) {
         if (input == null || input.trim().isEmpty()) {
-            throw new IllegalArgumentException("[ERROR] 올바르지 않은 형식으로 입력했습니다. 다시 입력해 주세요.1");
+            throw new IllegalArgumentException(Exception.INVALID_FORMAT.getMessage());
         }
         String[] parts = input.split(",");
         for (String part : parts) {
@@ -35,7 +36,7 @@ public class WishProductValidator {
 
     private static void validatePartFormat(String part) {
         if (!part.matches("\\[[\\w가-힣]+-\\d+\\]")) {
-            throw new IllegalArgumentException("[ERROR] 올바르지 않은 형식으로 입력했습니다. 다시 입력해 주세요.2");
+            throw new IllegalArgumentException(Exception.INVALID_FORMAT.getMessage());
         }
     }
 
@@ -43,10 +44,10 @@ public class WishProductValidator {
         try {
             int qty = Integer.parseInt(quantity);
             if (qty <= 0) {
-                throw new IllegalArgumentException("[ERROR] 올바르지 않은 형식으로 입력했습니다. 다시 입력해 주세요.3");
+                throw new IllegalArgumentException(Exception.INVALID_FORMAT.getMessage());
             }
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("[ERROR] 올바르지 않은 형식으로 입력했습니다. 다시 입력해 주세요.4");
+            throw new IllegalArgumentException(Exception.INVALID_FORMAT.getMessage());
         }
     }
 }

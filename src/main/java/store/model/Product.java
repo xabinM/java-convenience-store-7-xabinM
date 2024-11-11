@@ -3,6 +3,7 @@ package store.model;
 import java.text.DecimalFormat;
 
 public record Product(String name, int price, int stock, String promotion) {
+    private static final String NO_STOCK = "재고 없음 ";
 
     public Product sellProduct(int quantity) {
         if (stock - quantity < 0) {
@@ -16,7 +17,7 @@ public record Product(String name, int price, int stock, String promotion) {
     @Override
     public String toString() {
         DecimalFormat priceFormat = new DecimalFormat("#,###");
-        String stockInfo = "재고 없음 ";
+        String stockInfo = NO_STOCK;
         String promotionInfo = "";
         if (stock != 0) {
             stockInfo = stock + "개 ";
@@ -36,7 +37,6 @@ public record Product(String name, int price, int stock, String promotion) {
 
         return stock >= quantity;
     }
-
 
     public boolean isExistPromotion() {
 

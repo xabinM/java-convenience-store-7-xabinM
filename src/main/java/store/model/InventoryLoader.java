@@ -1,5 +1,7 @@
 package store.model;
 
+import store.exception.Exception;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -20,7 +22,7 @@ public class InventoryLoader {
 
             return br.lines().map(this::parseProduct).collect(Collectors.toList());
         } catch (IOException e) {
-            throw new IllegalArgumentException("파일을 읽는 도중 에러가 발생했습니다.");
+            throw new IllegalArgumentException(Exception.INVALID_FILE_FORMAT.getMessage());
         }
     }
 

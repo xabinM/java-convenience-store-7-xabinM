@@ -13,6 +13,7 @@ public class OutputView {
     private static final String REQUEST_BUY_PRODUCT = "현재 %s %d개는 프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까? (Y/N)\n";
     private static final String REQUEST_APPLY_MEMBERSHIP_DISCOUNT = "멤버십 할인을 받으시겠습니까? (Y/N)";
     private static final String REQUEST_REPURCHASE = "감사합니다. 구매하고 싶은 다른 상품이 있나요? (Y/N)";
+
     public void printEntry(Inventory inventory) {
         printWelcomeMessage();
         System.out.println();

@@ -1,5 +1,7 @@
 package store.model;
 
+import store.exception.Exception;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,7 +17,7 @@ public record Inventory(List<Product> inventory) {
         return inventory.stream()
                 .filter(product -> product.compareName(name))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("[ERROR] 존재하지 않는 상품입니다. 다시 입력해 주세요."));
+                .orElseThrow(() -> new IllegalArgumentException(Exception.PRODUCT_NOT_FOUND.getMessage()));
     }
 
     public int findTotalStockByName(String name) {
