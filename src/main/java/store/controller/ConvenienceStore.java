@@ -15,10 +15,10 @@ public class ConvenienceStore {
     private final InputView inputView;
     private final OutputView outputView;
 
-    public ConvenienceStore(Counter counter, Inventory inventory, Promotions promotions) {
+    public ConvenienceStore(Counter counter, Inventory inventory) {
         this.counter = counter;
         this.inventory = inventory;
-        this.inputView = new InputView();
+        this.inputView = new InputView(inventory);
         this.outputView = new OutputView();
     }
 
@@ -27,6 +27,9 @@ public class ConvenienceStore {
         List<WishProduct> wishProducts = processRequestPurchase();
         List<ResultDTO> result = processPromotionAndStock(wishProducts);
         processDisplayReceipt(result);
+        if (processRepurchase()) {
+            runStore();
+        }
     }
 
     private void processDisplayProducts() {;
@@ -34,18 +37,26 @@ public class ConvenienceStore {
     }
 
     private List<WishProduct> processRequestPurchase() {
-        outputView.printRequestPurchase();
+        while (true){
+            try {
+                outputView.printRequestPurchase();
 
-        return inputView.requestPurchase();
+                return inputView.requestPurchase(inventory);
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
     private List<ResultDTO> processPromotionAndStock(List<WishProduct> wishProducts) {
         final List<ResultDTO> result = new ArrayList<>();
 
         for (WishProduct wishProduct : wishProducts) {
-            if (counter.checkIsPromotionProduct(wishProduct.name())) {
+            boolean check = counter.checkIsPromotionProduct(wishProduct.name());
+            if (check) {
                 result.add(processOnPromotion(wishProduct));
-            } else {
+            }
+            if (!check) {
                 result.add(processNonPromotion(wishProduct));
             }
         }
@@ -53,22 +64,14 @@ public class ConvenienceStore {
     }
 
     private ResultDTO processOnPromotion(WishProduct wishProduct) {
-        try {
-            return counter.checkPromotionPeriod(wishProduct);
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        }
-        return null;
+
+        return counter.checkPromotionPeriod(wishProduct);
     }
 
     private ResultDTO processNonPromotion(WishProduct wishProduct) {
-        try {
-            Product product = inventory.findProductByName(wishProduct.name());
-            return counter.checkNormalStock(wishProduct, product);
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        }
-        return null;
+        Product product = inventory.findProductByName(wishProduct.name());
+
+        return counter.checkNormalStock(wishProduct, product);
     }
 
     private void processDisplayReceipt(List<ResultDTO> result) {
@@ -80,11 +83,23 @@ public class ConvenienceStore {
         while (true){
             try {
                 outputView.printMembershipConfirm();
-                return inputView.requestMemberShipConfirm().equals("Y");
+                String input = inputView.requestMemberShipConfirm();
+                return input.equals("Y");
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
             }
         }
     }
 
+    private boolean processRepurchase() {
+        while (true){
+            try {
+                outputView.printRepurchaseConfirm();
+                String input = inputView.requestRepurchaseConfirm();
+                return input.equals("Y");
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
 }
