@@ -16,15 +16,15 @@ public record Product(String name, int price, int stock, String promotion) {
     @Override
     public String toString() {
         DecimalFormat priceFormat = new DecimalFormat("#,###");
-        String priceInfo = "재고 없음 ";
+        String stockInfo = "재고 없음 ";
         String promotionInfo = "";
-        if (price != 0) {
-            priceInfo = priceFormat.format(price) + "원 ";
+        if (stock != 0) {
+            stockInfo = stock + "개 ";
         }
         if (promotion != null) {
             promotionInfo = promotion;
         }
-        return "- " + name + " " + priceInfo + stock + "개 " + promotionInfo;
+        return "- " + name + " " + priceFormat.format(price) + "원 " + stockInfo + promotionInfo;
     }
 
     public boolean compareName(String targetName) {
