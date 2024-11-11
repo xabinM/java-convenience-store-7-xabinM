@@ -12,7 +12,7 @@ public class Application {
         Inventory inventory = new Inventory(new InventoryLoader().loadProductsFromFile());
         Promotions promotions = new Promotions(new PromotionLoader().loadPromotionFromFile());
         ConvenienceStore convenienceStore = new ConvenienceStore(
-                new Counter(inventory, promotions), inventory, promotions);
+                new Counter(inventory, promotions), inventory);
         convenienceStore.runStore();
     }
 }
